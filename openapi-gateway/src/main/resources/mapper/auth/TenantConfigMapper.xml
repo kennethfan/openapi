@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.kennethfan.openapi.gateway.dao.auth.mapper.TenantConfigMapper">
+
+    <resultMap id="BaseResultMap" type="io.github.kennethfan.openapi.gateway.model.auth.TenantConfig">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="tenantId" column="tenant_id" jdbcType="VARCHAR"/>
+        <result property="tenantName" column="tenant_name" jdbcType="VARCHAR"/>
+        <result property="tenantDesc" column="tenant_desc" jdbcType="VARCHAR"/>
+        <result property="appKey" column="app_key" jdbcType="VARCHAR"/>
+        <result property="secret" column="secret" jdbcType="CHAR"/>
+        <result property="publicKey" column="public_key" jdbcType="VARCHAR"/>
+        <result property="privateKey" column="private_key" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+        <result property="expireTime" column="expire_time" jdbcType="BIGINT"/>
+        <result property="createTime" column="create_time" jdbcType="BIGINT"/>
+        <result property="updateTime" column="update_time" jdbcType="BIGINT"/>
+    </resultMap>
+
+</mapper>

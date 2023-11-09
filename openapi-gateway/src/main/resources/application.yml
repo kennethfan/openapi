@@ -1,0 +1,68 @@
+server:
+  port: 8421
+
+logging:
+  level:
+    cn.dreamkey: debug
+    org.springframework: warn
+
+spring:
+  main:
+    allow-circular-references: true
+  codec:
+    max-in-memory-size: 2MB
+  application:
+    name: openapi
+  output:
+    ansi:
+      enabled: detect
+  config:
+    import:
+      - optional:nacos:openapi.yml?group=DEFAULT_GROUP&refreshEnabled=true  # 监听 DEFAULT_GROUP:openapi.yml
+      - optional:nacos:openapi.yml
+  cloud:
+    nacos:
+      config:
+        group: DEFAULT_GROUP
+        server-addr: 127.0.0.1:8848
+        username: nacos
+        password: nacos
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/openapi?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      # 初始化物理连接个数
+      initial-size: 5
+      # 最大连接池数量
+      max-active: 80
+      # 最小连接池数量
+      min-idle: 5
+      # 获取连接时最大等待时间(ms)
+      max-wait: 60000
+      # 开启缓存preparedStatement(PSCache)
+      pool-prepared-statements: true
+      # 启用PSCache后，指定每个连接上PSCache的大小
+      max-pool-prepared-statement-per-connection-size: 20
+      # 用来检测连接是否有效的sql
+      validation-query: select 'x'
+      # 申请连接时不检测连接是否有效
+      test-on-borrow: false
+      # 归还连接时不检测连接是否有效
+      test-on-return: false
+      # 申请连接时检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效（不影响性能）
+      test-while-idle: true
+      # 检测连接的间隔时间，若连接空闲时间 >= minEvictableIdleTimeMillis，则关闭物理连接
+      time-between-eviction-runs-millis: 60000
+      # 连接保持空闲而不被驱逐的最小时间(ms)
+      min-evictable-idle-time-millis: 300000
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: auto
+  configuration:
+    map-underscore-to-camel-case: true
