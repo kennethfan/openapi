@@ -6,6 +6,7 @@ import cn.hutool.crypto.digest.MD5;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
@@ -13,6 +14,8 @@ import java.util.UUID;
 
 @AllArgsConstructor
 public class ClientHelper {
+
+    private static final String DELIMITER = "\n";
 
     private String appKey;
 
@@ -57,7 +60,21 @@ public class ClientHelper {
      * @return
      */
     public String encryptBody(String body) {
-        return Base64.getEncoder().encodeToString(rsaEncryptor.encrypt(body.getBytes(StandardCharsets.UTF_8)));
+        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+        final int bodyLength = bytes.length;
+        final int maxPlainLength = rsaEncryptor.getMaxPlainLength();
+        StringBuilder sb = new StringBuilder();
+        int start = 0;
+        while (start < bodyLength) {
+            int remain = Math.min(maxPlainLength, bytes.length - start);
+            byte[] seg = new byte[remain];
+            System.arraycopy(bytes, start, seg, 0, remain);
+            sb.append(Base64.getEncoder().encodeToString(rsaEncryptor.encrypt(seg)))
+                    .append(DELIMITER);
+            start += maxPlainLength;
+        }
+
+        return StringUtils.strip(sb.toString(), DELIMITER);
     }
 
     /**
@@ -67,6 +84,12 @@ public class ClientHelper {
      * @return
      */
     public String decryptBody(String body) {
-        return new String(rsaEncryptor.decrypt(Base64.getDecoder().decode(body.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
+        String[] segArr = body.split(DELIMITER);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(rsaEncryptor.getMaxPlainLength() * segArr.length);
+        for (String seg : segArr) {
+            byteBuffer.put(rsaEncryptor.decrypt(Base64.getDecoder().decode(seg.getBytes(StandardCharsets.UTF_8))));
+        }
+
+        return new String(byteBuffer.array(), StandardCharsets.UTF_8);
     }
 }

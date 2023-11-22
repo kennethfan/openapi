@@ -8,12 +8,17 @@ import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 import static io.github.kennethfan.openapi.client.encrypt.RsaKeyGenerator.*;
 
 public class RsaEncryptor {
+
+    private final int PADDING_LENGTH = 11;
+    private final int BITS_PER_BYTE = 8;
 
     private Key key;
 
@@ -107,5 +112,30 @@ public class RsaEncryptor {
         }
 
         return input;
+    }
+
+
+    public int getMaxPlainLength() {
+        return getKeySize() / BITS_PER_BYTE - PADDING_LENGTH;
+    }
+
+    /**
+     * 获取key 长度
+     *
+     * @return bits of key
+     */
+    private int getKeySize() {
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            if (key instanceof PrivateKey) {
+                return keyFactory.getKeySpec(key, RSAPrivateKeySpec.class).getModulus().bitLength();
+            } else if (key instanceof PublicKey) {
+                return keyFactory.getKeySpec(key, RSAPublicKeySpec.class).getModulus().bitLength();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("get key size error", e);
+        }
+
+        throw new UnsupportedOperationException("can not get key size");
     }
 }
